@@ -16,12 +16,9 @@ public class Hello {
     public static void main(String[] args) {
         ArrayList<Products> products = new ArrayList<>();
         ArrayList<Products> basket = new ArrayList<>();
+        ArrayList<Products> newBasket = new ArrayList<>();
 
         Scanner in = new Scanner(System.in);
-        boolean work = true;
-        String choise;
-        String product;
-        int count;
         double amount = 0;
 
         products.add(new Products("banana", 100, 15));
@@ -32,21 +29,7 @@ public class Hello {
 
         outputProducts(products);
 
-        while(work){
-            System.out.println("Do you want take some vegetables?");
-            System.out.println("Yes - Y, No - N");
-            choise = in.next();
-            if (choise.toUpperCase().equals("Y")) {
-                System.out.println("What are you want take?");
-                product = in.next();
-                System.out.println("How much?");
-                count = in.nextInt();
-                addProductInBasket(products, basket, product, count);
-            }
-            else {
-                work = false;
-            }
-        }
+        addProductInBasket(products, chooseProducts(in, basket));
 
         System.out.println("\n" + "Products:");
 
@@ -56,80 +39,85 @@ public class Hello {
 
         outputProducts(basket);
 
-        amount = outputAmount(basket, amount);
+        amount = outputAmount(basket);
 
         System.out.println("Total amount = " + amount);
 
-        work = true;
+        remove(basket, chooseProducts(in, newBasket), products);
 
+        System.out.println("\n" + "Products:");
+
+        outputProducts(products);
+
+        System.out.println("\n" + "Your basket:");
+
+        outputProducts(basket);
+
+        amount = outputAmount(basket);
+
+        System.out.println("Total amount = " + amount);
+    }
+
+    public static ArrayList<Products> chooseProducts(Scanner in, ArrayList<Products> basket) {
+        boolean work = true;
+        String choise;
+        String product;
+        int count;
+        double price = 0;
         while(work){
-            System.out.println("Do you want to remove the product from the basket?");
+            System.out.println("Do you want to choose a product?");
             System.out.println("Yes - Y, No - N");
             choise = in.next();
             if (choise.toUpperCase().equals("Y")) {
-                System.out.println("Which product do you want to remove?");
+                System.out.println("What do you want to choose?");
                 product = in.next();
-                System.out.println("All or how much?");
-                System.out.println("All - -1, How much - some number");
+                System.out.println("How much?");
                 count = in.nextInt();
-                if (count == -1)
-                    removeAll(basket, product);
-                else
-                    remove(basket, product, count);
+                basket.add(new Products(product, count, price));
             }
             else {
                 work = false;
             }
         }
-
-        outputProducts(basket);
-
-        amount = outputAmount(basket, amount);
-
-        System.out.println("Total amount = " + amount);
+        return basket;
     }
 
-    public static void addProductInBasket(ArrayList<Products> products, ArrayList<Products> basket, String product, int count) {
-        boolean exists = false;
-        for(Products p : products) {
-            if (p.getProduct().equals(product.toLowerCase()) && (p.getCount() - count > -1)) {
-                p.setCount(p.getCount() - count);
-                for(Products cp : basket){
-                    if (cp.getProduct().contains(product)) {
-                        cp.setCount(cp.getCount() + count);
-                        exists = true;
+    public static void addProductInBasket(ArrayList<Products> products, ArrayList<Products> basket) {
+        for (Products b : basket) {
+            for (Products p : products) {
+                if (p.getProduct().equals(b.getProduct().toLowerCase()) && (p.getCount() - b.getCount() >= 0)) {
+                    p.setCount(p.getCount() - b.getCount());
+                    b.setPrice(p.getPrice());
+                    break;
+                }
+            }
+        }
+    }
+
+    public static void remove(ArrayList<Products> basket, ArrayList<Products> newBasket, ArrayList<Products> products) {
+        for(Products nb : newBasket) {
+            for (Products b : basket) {
+                if (nb.getProduct().equals(b.getProduct()) && nb.getCount() <= b.getCount()) {
+                    for (Products p : products) {
+                        if (nb.getProduct().equals(p.getProduct())) {
+                            b.setCount(b.getCount() - nb.getCount());
+                            p.setCount(p.getCount() + nb.getCount());
+                            nb.setPrice(p.getPrice());
+                        }
                     }
                 }
-                if (!exists)
-                    basket.add(new Products(p.getProduct(), count, p.getPrice()));
-            }
-        }
-    }
-
-    public static void removeAll(ArrayList<Products> basket, String product) {
-        for(Products b: basket) {
-            if(b.getProduct().equals(product.toLowerCase())){
-                basket.remove(b);
-            }
-        }
-    }
-
-    public static void remove(ArrayList<Products> basket, String product, int count) {
-        for(Products b: basket) {
-            if(b.getProduct().equals(product.toLowerCase()) && count <= b.getCount()) {
-                b.setCount(b.getCount() - count);
             }
         }
     }
 
     public static void outputProducts(ArrayList<Products> product) {
         for(Products p: product) {
-            System.out.println(p.getInfoProducts());
+            System.out.println(p);
         }
     }
 
-    public static double outputAmount(ArrayList<Products> product, double amount) {
-        amount = 0;
+    public static double outputAmount(ArrayList<Products> product) {
+        double amount = 0;
         for(Products p: product) {
             amount += (p.getPrice() * p.getCount());
         }
