@@ -2,48 +2,40 @@ package first;
 
 import java.util.*;
 
-/**
- * Shop basket)))
- * @author kozulin Mikhail
- * @param products - список продуктов
- * @param basket - корзина
- * @param work - продолжение выбора товара в корзину
- * @param choise - продолжаем выбор или нет?
- * @param product - выбор товара
- * @param count - выбор кол-во товара
- */
 public class Hello {
     public static void main(String[] args) {
         ArrayList<Products> products = new ArrayList<>();
         ArrayList<Products> basket = new ArrayList<>();
         ArrayList<Products> newBasket = new ArrayList<>();
-
         Scanner in = new Scanner(System.in);
+
         double amount = 0;
 
-        products.add(new Products("banana", 100, 15));
-        products.add(new Products("apple", 50, 10));
-        products.add(new Products("misha", 1, 1_000_000));
-
-        System.out.println("Products:");
+        listProducts(products);
 
         outputProducts(products);
 
         addProductInBasket(products, chooseProducts(in, basket));
 
-        System.out.println("\n" + "Products:");
-
-        outputProducts(products);
-
-        System.out.println("\n" + "Your basket:");
-
-        outputProducts(basket);
-
-        amount = outputAmount(basket);
-
-        System.out.println("Total amount = " + amount);
+        outputInfo(products, basket);
 
         remove(basket, chooseProducts(in, newBasket), products);
+
+        outputInfo(products, basket);
+    }
+
+    public static void listProducts(ArrayList<Products> products) {
+        products.add(new Products("banana", 100, 15));
+        products.add(new Products("apple", 50, 10));
+        products.add(new Products("pear", 50, 10));
+        products.add(new Products("lemon", 50, 10));
+        products.add(new Products("melon", 50, 10));
+        products.add(new Products("peach", 50, 10));
+        products.add(new Products("misha", 1, 1_000_000));
+    }
+
+    public static void outputInfo(ArrayList<Products> products, ArrayList<Products> basket) {
+        double amount = 0;
 
         System.out.println("\n" + "Products:");
 
